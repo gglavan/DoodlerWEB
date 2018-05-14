@@ -1,186 +1,468 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
-    <link rel="stylesheet" href="../assets/css/index.css">
-    <link rel="stylesheet" href="../assets/icons/flaticon.css">
-    <link  href="../node_modules/cropperjs/dist/cropper.css" rel="stylesheet">
-    <script src="../node_modules/cropperjs/dist/cropper.js"></script>
-  </head>
-  <body>
-    <!-- Sketch Container -->
-    <div>
-      <canvas id="can"></canvas>
-    </div>
-    <!-- Left Sidebar Menu -->
-    <div class="sidebar-left">
-      <div id="pencil" class="icon-option" title="Pencil">
-        <i class="flaticon-pencil"></i>  
-      </div>
-      <div id="line" class="icon-option" title="Line">
-        <i class="flaticon-graphic-design"></i>  
-      </div>
-      <div id="color-palette" class="icon-option" title="Palette">
-        <i class="flaticon-paint-palette"></i>
-      </div>
-      <div id="rubber" class="icon-option" title="Rubber">
-        <i class="flaticon-eraser"></i>
-      </div>
-      <div id="picker" class="icon-option" title="Picker">
-        <i class="flaticon-eyedropper"></i>
-      </div>
-      <div id="rotate" class="icon-option" title="Rotate">
-        <i class="flaticon-rotate"></i>    
-      </div>
-      <div id="mirror" class="icon-option" title="Mirror">
-        <i class="flaticon-reflect"></i>
-      </div>
-      <div id="scissors" class="icon-option" title="Crop">
-        <i class="flaticon-transform-box"></i>
-      </div>
-      <div id="scale" class="icon-option" title="Scale">
-        <i class="flaticon-maximize"></i>
-      </div>
-      <div id="slideshow" class="icon-option" title="Slideshow">
-          <i class="flaticon-photogram"></i>
-        </div>
-    </div>
 
-    <!-- Right Sidebar Menu -->
-    <div class="sidebar-right" id="pencil-sidebar">
-      <div class="sidebar-title">Pencil</div>
-      <div class="title-separator"></div>
-      <div class="slidecontainer">
-        <div>Size: <span id="pencil-size"></span>px</div>
-        <input type="range" min="1" max="100" value="2" class="slider" id="pencil-size-slider">
-      </div>
+<head>
+  <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
+  <link rel="stylesheet" href="../assets/css/index.css">
+  <link rel="stylesheet" href="../assets/icons/flaticon.css">
+</head>
+
+<body>
+  <!-- Sketch Container -->
+  <div class="wrapper">
+    <canvas id="can"></canvas>
+  </div>
+  <!-- Left Sidebar Menu -->
+  <div class="sidebar-left">
+    <div id="pencil" class="icon-option" title="Pencil">
+      <i class="flaticon-pencil"></i>
     </div>
-    <div class="sidebar-right" id="line-sidebar">
-      <div class="sidebar-title">Line</div>
-      <div class="title-separator"></div>
-      <div class="slidecontainer">
-        <div>Size: <span id="line-size"></span>px</div>
-        <input type="range" min="1" max="100" value="2" class="slider" id="line-size-slider">
-      </div>
+    <div id="color-palette" class="icon-option" title="Palette">
+      <i class="flaticon-paint-palette"></i>
     </div>
-    <div class="sidebar-right" id="palette-sidebar">
-      <div class="sidebar-title">Palette</div>
-      <div class="title-separator"></div>
-      <div class="wheel" id="colorWheelDemo"></div>
+    <div id="rubber" class="icon-option" title="Rubber">
+      <i class="flaticon-eraser"></i>
+    </div>
+    <div id="picker" class="icon-option" title="Picker">
+      <i class="flaticon-eyedropper"></i>
+    </div>
+    <div id="rotate" class="icon-option" title="Rotate">
+      <i class="flaticon-rotate"></i>
+    </div>
+    <div id="mirror" class="icon-option" title="Mirror">
+      <i class="flaticon-reflect"></i>
+    </div>
+    <div id="scissors" class="icon-option" title="Crop">
+      <i class="flaticon-transform-box"></i>
+    </div>
+    <div id="scale" class="icon-option" title="Scale">
+      <i class="flaticon-maximize"></i>
+    </div>
+    <div id="histogram-tool" class="icon-option" title="Histogram">
+      <i class="flaticon-photogram"></i>
+    </div>
+    <input id="openFile" type="file" onchange="getImage()" style="visibility:hidden" />
+  </div>
+
+  <!-- Right Sidebar Menu -->
+  <div class="sidebar-right" id="pencil-sidebar">
+    <div class="sidebar-title">Pencil</div>
+    <div class="title-separator"></div>
+    <div class="slidecontainer">
       <div class="slidecontainer switch-align">
-        <div>Color:</div>
-        <form id="color-form">
-          <input type="text" id="color-value">
-        </form>
-      </div>
-      <div class="title-separator"></div>
-      <div class="slidecontainer">
-        <div>Contrast: <span id="contrast-value"></span>%</div>
-        <input type="range" min="-100" max="100" value="0" class="slider" id="contrast-value-slider">
-      </div>
-      <div class="slidecontainer">
-        <div>Brightness: <span id="brightness-value"></span>%</div>
-        <input type="range" min="-100" max="100" value="0" class="slider" id="brightness-value-slider">
-      </div>
-      <div class="slidecontainer">
-        <div>Saturation: <span id="saturation-value"></span>%</div>
-        <input type="range" min="0" max="100" value="0" class="slider" id="saturation-value-slider">
-      </div>
-      <div class="slidecontainer switch-align">
-        <div>Grayscale:</div>
+        <div>Drawing:</div>
         <label class="switch">
-          <input type="checkbox" id="grayscale">
+          <input type="checkbox" id="drawing-mode" checked>
           <span class="toggle round"></span>
         </label>
       </div>
-      <div class="slidecontainer switch-align">
-        <div>Invert:</div>
-        <label class="switch">
-          <input type="checkbox" id="invert">
-          <span class="toggle round"></span>
+      <div id="drawing-mode-options">
+        <label for="drawing-mode-selector">Mode:</label>
+        <select style="margin: 15px 5px 15px 5px;" id="drawing-mode-selector">
+          <option>Pencil</option>
+          <option>Circle</option>
+          <option>Spray</option>
+          <option>Pattern</option>
+          <option value="hline">H-Line</option>
+          <option value="vline">V-Line</option>
+          <option value="square">Square</option>
+          <option value="diamond">Diamond</option>
+          <option value="texture">Texture</option>
+        </select>
+        <div>Size:
+          <span id="drawing-line-value"></span>px</div>
+        <input type="range" min="1" max="100" value="2" class="slider" id="drawing-line-width">
+        <label for="drawing-color">Line color:</label>
+        <input type="color" value="#005E7A" id="drawing-color">
+        <br>
+        <br>
+        <label for="drawing-shadow-color">Shadow color:</label>
+        <input type="color" style="margin-top:0px;" value="#005E7A" id="drawing-shadow-color">
+        <br>
+        <br>
+
+        <div>Shadow width:
+          <span id="drawing-shadow-value"></span>px</div>
+        <input type="range" min="1" max="100" value="0" class="slider" id="drawing-shadow-width">
+
+        <div>Shadow offset:
+          <span id="drawing-shadow-offset-value"></span>px</div>
+        <input type="range" min="1" max="100" value="0" class="slider" id="drawing-shadow-offset">
+
+      </div>
+
+    </div>
+  </div>
+  <div class="sidebar-right filters" id="palette-sidebar">
+    <div class="sidebar-title" style="text-align:center;">Filters</div>
+    <div class="title-separator"></div>
+    <div class="slidecontainer switch-align">
+      <div>Use WebGL:</div>
+      <label class="switch">
+        <input type="checkbox" id="webgl" checked>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="title-separator"></div>
+    <div class="slidecontainer switch-align">
+      <div>Grayscale:</div>
+      <label class="switch">
+        <input type="checkbox" id="grayscale" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Invert:</div>
+      <label class="switch">
+        <input type="checkbox" id="invert" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Sepia:</div>
+      <label class="switch">
+        <input type="checkbox" id="sepia" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Black/White:</div>
+      <label class="switch">
+        <input type="checkbox" id="blackwhite" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Brownie:</div>
+      <label class="switch">
+        <input type="checkbox" id="brownie" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Vintage:</div>
+      <label class="switch">
+        <input type="checkbox" id="vintage" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Kodachrome:</div>
+      <label class="switch">
+        <input type="checkbox" id="kodachrome" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Technicolor:</div>
+      <label class="switch">
+        <input type="checkbox" id="technicolor" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Polaroid:</div>
+      <label class="switch">
+        <input type="checkbox" id="polaroid" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="title-separator"></div>
+    <div class="slidecontainer switch-align">
+      <div>Brightness:</div>
+      <label class="switch">
+        <input type="checkbox" id="brightness" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Value:
+      <input type="range" id="brightness-value" class="slider" value="0.1" min="-1" max="1" step="0.003921" disabled>
+    </label>
+    <div class="slidecontainer switch-align">
+      <div>Gamma:</div>
+      <label class="switch">
+        <input type="checkbox" id="gamma" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Red:
+      <input type="range" id="gamma-red" class="slider" value="1" min="0.2" max="2.2" step="0.003921" disabled>
+    </label>
+    <br>
+    <label>Green:
+      <input type="range" id="gamma-green" class="slider" value="1" min="0.2" max="2.2" step="0.003921" disabled>
+    </label>
+    <br>
+    <label>Blue:
+      <input type="range" id="gamma-blue" class="slider" value="1" min="0.2" max="2.2" step="0.003921" disabled>
+    </label>
+    <div class="slidecontainer switch-align">
+      <div>Contrast:</div>
+      <label class="switch">
+        <input type="checkbox" id="contrast" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Value:
+      <input type="range" id="contrast-value" class="slider" value="0" min="-1" max="1" step="0.003921" disabled>
+    </label>
+    <div class="slidecontainer switch-align">
+      <div>Saturation:</div>
+      <label class="switch">
+        <input type="checkbox" id="saturation" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Value:
+      <input type="range" id="saturation-value" class="slider" value="0" min="-1" max="1" step="0.003921" disabled>
+    </label>
+    <div class="slidecontainer switch-align">
+      <div>Hue:</div>
+      <label class="switch">
+        <input type="checkbox" id="hue" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Value:
+      <input type="range" id="hue-value" class="slider" value="0" min="-2" max="2" step="0.002" disabled>
+    </label>
+    <div class="slidecontainer switch-align">
+      <div>Noise:</div>
+      <label class="switch">
+        <input type="checkbox" id="noise" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Value:
+      <input type="range" id="noise-value" class="slider" value="100" min="0" max="1000" disabled>
+    </label>
+    <div class="slidecontainer switch-align">
+      <div>Pixelate:</div>
+      <label class="switch">
+        <input type="checkbox" id="pixelate" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Value:
+      <input type="range" id="pixelate-value" class="slider" value="4" min="2" max="20" disabled>
+    </label>
+    <div class="slidecontainer switch-align">
+      <div>Blur:</div>
+      <label class="switch">
+        <input type="checkbox" id="blur" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Value:
+      <input type="range" id="blur-value" class="slider" value="0.1" min="0" max="1" step="0.01" disabled>
+    </label>
+    <div class="title-separator"></div>
+    <div class="slidecontainer switch-align">
+      <div>Sharpen:</div>
+      <label class="switch">
+        <input type="checkbox" id="sharpen" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Emboss:</div>
+      <label class="switch">
+        <input type="checkbox" id="emboss" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <div class="slidecontainer switch-align">
+      <div>Blend Color:</div>
+      <label class="switch">
+        <input type="checkbox" id="blend" disabled>
+        <span class="toggle round"></span>
+      </label>
+    </div>
+    <br>
+    <label>Mode:</label>
+    <select id="blend-mode" name="blend-mode">
+      <option selected value="add">Add</option>
+      <option value="diff">Diff</option>
+      <option value="subtract">Subtract</option>
+      <option value="multiply">Multiply</option>
+      <option value="screen">Screen</option>
+      <option value="lighten">Lighten</option>
+      <option value="darken">Darken</option>
+      <option value="overlay">Overlay</option>
+      <option value="exclusion">Exclusion</option>
+      <option value="tint">Tint</option>
+    </select>
+    <br>
+    <label>Color:
+      <input type="color" id="blend-color" value="#00f900">
+    </label>
+    <br>
+    <label>Alpha:
+      <input type="range" id="blend-alpha" class="slider" min="0" max="1" value="1" step="0.01">
+    </label>
+    <br>
+    </p>
+  </div>
+  </div>
+  <div class="sidebar-right" id="rubber-sidebar">
+    <div class="sidebar-title">Rubber</div>
+    <div class="title-separator"></div>
+    <div class="slidecontainer">
+      <div>Size:
+        <span id="rubber-size"></span>px</div>
+      <input type="range" min="1" max="100" value="10" class="slider" id="rubber-size-slider">
+    </div>
+  </div>
+  <div class="sidebar-right" id="scissors-sidebar">
+    <div class="sidebar-title">Crop</div>
+    <div class="title-separator"></div>
+    <div class="crop-tool-set">
+      <button id="move-mode" title="Move Mode">
+        <i class="flaticon-move"></i>
+      </button>
+      <button id="crop-mode" title="Crop Mode">
+        <i class="flaticon-crop-symbol"></i>
+      </button>
+    </div>
+    <div class="crop-tool-set">
+      <button id="zoom-in" title="Zoom In">
+        <i class="flaticon-zoom-in"></i>
+      </button>
+      <button id="zoom-out" title="Zoom Out">
+        <i class="flaticon-zoom-out"></i>
+      </button>
+    </div>
+    <div class="crop-tool-set">
+      <button id="move-left" title="Move Left">
+        <i class="flaticon-arrow-pointing-to-left"></i>
+      </button>
+      <button id="move-right" title="Move Right">
+        <i class="flaticon-arrow-pointing-to-right"></i>
+      </button>
+    </div>
+    <div class="crop-tool-set">
+      <button id="move-up" title="Move Up">
+        <i class="flaticon-arrow-up"></i>
+      </button>
+      <button id="move-down" title="Move Down">
+        <i class="flaticon-arrow-pointing-down"></i>
+      </button>
+    </div>
+    <div class="crop-tool-set">
+      <button id="crop" title="Crop Image">
+        <i class="flaticon-correct-symbol"></i>
+      </button>
+      <button id="clear" title="Clear Crop">
+        <i class="flaticon-cancel-mark"></i>
+      </button>
+    </div>
+    <div class="crop-tool-set">
+      <button id="reset" title="Reset Crop">
+        <i class="flaticon-repeat"></i>
+      </button>
+      <button id="exit" title="Exit Crop">
+        <i class="flaticon-exit-to-app-button"></i>
+      </button>
+    </div>
+  </div>
+  <div class="sidebar-right" id="rotate-sidebar">
+  </div>
+  <div class="sidebar-right" id="mirror-sidebar">
+    <div class="sidebar-title">Mirror</div>
+    <div class="title-separator"></div>
+    <p>Under construction...</p>
+  </div>
+  <div class="sidebar-right" id="scale-sidebar">
+    <div class="sidebar-title">Scale</div>
+    <div class="title-separator"></div>
+    <div class="slidecontainer">
+      <div>Scale: x
+        <span id="scale-size"></span>
+      </div>
+      <input type="range" min="0" max="100" value="50" class="slider" id="scale-size-slider">
+    </div>
+    <div class="slidecontainer">
+      <div>Width:
+        <span id="width-size"></span>px</div>
+      <input type="number" id="width-size-input">
+    </div>
+    <div class="slidecontainer">
+      <div>Height:
+        <span id="height-size"></span>px</div>
+      <input type="number" id="height-size-input">
+    </div>
+    <div class="slidecontainer">
+      <button id="scale-button">Apply</button>
+    </div>
+  </div>
+  <div class="sidebar-right" id="histogram-sidebar">
+    <div class="sidebar-title">Histogram</div>
+    <div class="title-separator"></div>
+    <div class="slidecontainer">
+      <canvas class="thumb" id="histogram" width="200" height="160">Your browser does not have support for Canvas.</canvas>
+      <p>
+        <label>Histogram for:
+          <select id="histType">
+            <option value="rgb">RGB</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+            <option value="hue">Hue</option>
+            <option value="sat">Saturation</option>
+            <option value="val">Value (brightness)</option>
+            <option value="cmyk">CMYK</option>
+            <option value="cyan">Cyan</option>
+            <option value="magenta">Magenta</option>
+            <option value="yellow">Yellow</option>
+            <option value="kelvin">Kelvin (Black)</option>
+          </select>
         </label>
-      </div>
-      <div class="slidecontainer switch-align">
-        <div>Threshold:</div>
-        <label class="switch">
-          <input type="checkbox" id="threshold">
-          <span class="toggle round"></span>
+      </p>
+      <p>
+        <label>Plot style:
+          <select id="plotStyle">
+            <option value="continuous">Continuous</option>
+            <option value="discreet">Discreet</option>
+          </select>
         </label>
-      </div>
+      </p>
+
+      <p>
+        <label>Plot fill
+          <input id="plotFill" type="checkbox">
+        </label>
+      </p>
+
+      <p>
+        <label>Plot colors:
+          <select id="plotColors">
+            <option value="none">None</option>
+            <option value="flat">Flat colors</option>
+            <option value="gradient">Gradients</option>
+          </select>
+        </label>
+      </p>
+      <button onclick="imgLoaded()">Prepare Image</button>
     </div>
-    <div class="sidebar-right" id="rubber-sidebar">
-      <div class="sidebar-title">Rubber</div>
-      <div class="title-separator"></div>
-      <div class="slidecontainer">
-        <div>Size: <span id="rubber-size"></span>px</div>
-        <input type="range" min="1" max="100" value="10" class="slider" id="rubber-size-slider">
-      </div>
-    </div>
-    <div class="sidebar-right" id="scissors-sidebar">
-      <div class="sidebar-title">Crop</div>
-      <div class="title-separator"></div>
-      <div class="crop-tool-set">
-        <button id="move-mode" title="Move Mode"><i class="flaticon-move"></i></button>
-        <button id="crop-mode" title="Crop Mode"><i class="flaticon-crop-symbol"></i></button>
-      </div>
-      <div class="crop-tool-set">
-        <button id="zoom-in" title="Zoom In"><i class="flaticon-zoom-in"></i></button>
-        <button id="zoom-out" title="Zoom Out"><i class="flaticon-zoom-out"></i></button>
-      </div>
-      <div class="crop-tool-set">
-        <button id="move-left" title="Move Left"><i class="flaticon-arrow-pointing-to-left"></i></button>
-        <button id="move-right" title="Move Right"><i class="flaticon-arrow-pointing-to-right"></i></button>
-      </div>
-      <div class="crop-tool-set">
-        <button id="move-up" title="Move Up"><i class="flaticon-arrow-up"></i></button>
-        <button id="move-down" title="Move Down"><i class="flaticon-arrow-pointing-down"></i></button>
-      </div>
-      <div class="crop-tool-set">
-        <button id="crop" title="Crop Image"><i class="flaticon-correct-symbol"></i></button>
-        <button id="clear" title="Clear Crop"><i class="flaticon-cancel-mark"></i></button>
-      </div>
-      <div class="crop-tool-set">
-        <button id="reset" title="Reset Crop"><i class="flaticon-repeat"></i></button>
-        <button id="exit" title="Exit Crop"><i class="flaticon-exit-to-app-button"></i></button>
-      </div>
-    </div>
-    <div class="sidebar-right" id="rotate-sidebar">
-    </div>
-    <div class="sidebar-right" id="mirror-sidebar">
-      <div class="sidebar-title">Mirror</div>
-      <div class="title-separator"></div>  
-      <p>Under construction...</p>
-    </div>
-    <div class="sidebar-right" id="scale-sidebar">
-      <div class="sidebar-title">Scale</div>
-      <div class="title-separator"></div>
-      <div class="slidecontainer">
-        <div>Scale: x<span id="scale-size"></span></div>
-        <input type="range" min="0" max="100" value="50" class="slider" id="scale-size-slider">
-      </div>
-      <div class="slidecontainer">
-        <div>Width: <span id="width-size"></span>px</div>
-        <input type="number" id="width-size-input">
-      </div>
-      <div class="slidecontainer">
-        <div>Height: <span id="height-size"></span>px</div>
-        <input type="number" id="height-size-input">
-      </div>
-      <div class="slidecontainer">
-        <button id="scale-button">Apply</button>
-      </div>
-    </div>
-    
-    <!-- end of sidebars -->
-    <script src="handler.js"></script>
-    <script src="sketch.js"></script>
-    <script src="../addons/iro.js-master/dist/iro.min.js"></script>
-    <script src="palette.js"></script>
-    <!-- <script src="../addons/slider.js"></script> -->
-    <script src="filter.js"></script>
-    <script>
-      if (window.module) 
-        module = window.module;
-    </script>
-  </body>
+  </div>
+
+  <!-- end of sidebars -->
+  <script src="../node_modules/fabric/dist/fabric.js"></script>
+  <script src="handler.js"></script>
+  <script src="sketch.js"></script>
+  <script src="histogram.js"></script>
+  <script>
+    if (window.module)
+      module = window.module;
+  </script>
+</body>
+
 </html>

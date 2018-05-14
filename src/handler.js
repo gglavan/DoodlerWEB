@@ -1,49 +1,46 @@
-const ipcRenderer = require('electron').ipcRenderer;
-const canvasBuffer = require('electron-canvas-to-buffer');
-const fs = require('fs');
-
-let img;
 let cropper;
 let cPushArray = new Array();
 let cStep = -1;
 
 let prevTool = null;
 let activeTool;
-let activeColor = "#000";
+window.activeColor = "#000";
 let prevSidebar = null;
 let activeSidebar = 0;
 
-ipcRenderer.on('open-file', (event, file) => {
-	img = new Image();
-	img.onload = function () {
-		canvas.width = img.width;
-		canvas.height = img.height;
-		ctx.drawImage(img, 0, 0, img.width, img.height);
-		cPushArray = new Array();
-		cStep = -1;
-		if (activeTool)
-			activeTool.body.classList.remove('active-option')
-		activeTool = null;
-	};
-	img.src = file;
-	resetFilters();
-});
+function openFile(e) {
+	if (e.keyCode === 79) {
+		const fileInput = document.getElementById('openFile');
+		fileInput.click();
+	}
+}
 
-ipcRenderer.on('save-file', (event, file) => {
-	const buffer = canvasBuffer(canvas, 'image/png')
-	fs.writeFile(file, buffer, function (err) {
-		if (err) throw err;
-		else console.log(`Write of, ${file}, was successful`);
-	})
-});
+function getImage() {
+	const fileInput = document.getElementById('openFile');
+	const image = fileInput.files[0].name;
+	fabric.Image.fromURL(image, function(oImg) {
+		oImg.set({'left':0});
+		oImg.set({'top':0});
+		canvas.add(oImg);
+	});
+}
 
-ipcRenderer.on('undo-option', (event) => {
-	cUndo();	
-});
+function saveFile(e) {
+	if (e.keyCode === 83) {
+		const buffer = canvas.toSVG();
+		const svgBlob = new Blob([buffer], {type:"image/svg+xml;charset=utf-8"});
+		const svgUrl = URL.createObjectURL(svgBlob);
+		const downloadLink = document.createElement("a");
+		downloadLink.href = svgUrl;
+		downloadLink.download = "image.svg";
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+		document.body.removeChild(downloadLink);
+	}
+}
 
-ipcRenderer.on('redo-option', (event) => {
-	cRedo();	
-});
+document.addEventListener('keyup', openFile, false);
+document.addEventListener('keyup', saveFile, false);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -85,28 +82,6 @@ function pencilDraw() {
 
 /////////////////////////////////////////////////
 
-const Line = {
-	body: document.getElementById('line'),
-	sidebar: document.getElementById('line-sidebar'),
-	size: 2,
-	color: activeColor
-}
-
-/////////////////////////////////////////////////
-
-Line.body.addEventListener('click', lineDraw);
-
-function lineDraw() {
-	if (prevTool)
-		prevTool.body.classList.remove('active-option')
-	if (prevTool == Crop) cropper.destroy();
-	prevTool = Line;
-	activeTool = Line;
-	Line.body.classList.add('active-option');
-	Line.active = true;
-	slide();
-}
-
 /////////////////////////////////////////////////
 
 const Palette = {
@@ -126,9 +101,6 @@ function colorSelector() {
 	Palette.body.classList.add('active-option');
 	Palette.active = true;
 	slide();
-	tempCanvas.width = canvas.width;
-	tempCanvas.height = canvas.height;
-	tempCtx.drawImage(canvas, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -281,10 +253,32 @@ function scale() {
   tempCanvas.width = cw;
   tempCanvas.height = ch;
   tempCtx.drawImage(canvas, 0, 0);
-  
+
 	document.getElementById('width-size').innerHTML = canvas.width;
 	document.getElementById('height-size').innerHTML = canvas.height;
 	document.getElementById('scale-size').innerHTML = (Number(document.getElementById('scale-size-slider').value) / 50).toFixed(2);
+}
+
+//////////////////////////////////////////////
+
+const Histogram = {
+	body: document.getElementById('histogram-tool'),
+	sidebar: document.getElementById('histogram-sidebar'),
+	size: 30,
+	color: '#fff'
+}
+
+Histogram.body.addEventListener('click', makeHistogram);
+
+function makeHistogram() {
+	if (prevTool)
+		prevTool.body.classList.remove('active-option')
+	if (prevTool == Crop) cropper.destroy();
+	prevTool = Histogram;
+	activeTool = Histogram;
+	Histogram.body.classList.add('active-option');
+	Histogram.active = true;
+	slide();
 }
 
 const moveModeOption = document.getElementById('move-mode');
@@ -312,11 +306,10 @@ cropOption.addEventListener('click', () => {
 	const croppedData = cropper.getData();
 	tempCanvas.width = croppedData.width;
 	tempCanvas.height = croppedData.height;
-	tempCtx.drawImage(canvas, croppedData.x, croppedData.y, croppedData.width, croppedData.height, 0, 0, tempCanvas.width, tempCanvas.height);
-	canvas.width = tempCanvas.width;
-	canvas.height = tempCanvas.height;
+	tempCtx.drawImage(canvasEl, croppedData.x, croppedData.y, croppedData.width, croppedData.height, 0, 0, tempCanvas.width, tempCanvas.height);
+	canvasEl.width = tempCanvas.width;
+	canvasEl.height = tempCanvas.height;
 	cropper.destroy();
-	ctx.drawImage(tempCanvas, 0, 0);
 });
 clearOption.addEventListener('click', () => cropper.clear());
 resetOption.addEventListener('click', () => cropper.reset());
@@ -358,8 +351,14 @@ scaleSizeSlider.oninput = function() {
 }
 
 
-const pencilSizeSlider = document.getElementById('pencil-size-slider');
-const pencilSize = document.getElementById('pencil-size');
+const pencilSizeSlider = document.getElementById('drawing-line-width');
+const pencilSize = document.getElementById('drawing-line-value');
+
+const shadowSizeSlider = document.getElementById('drawing-shadow-width');
+const shadowSize = document.getElementById('drawing-shadow-value');
+
+const shadowOffsetSizeSlider = document.getElementById('drawing-shadow-offset');
+const shadowOffsetSize = document.getElementById('drawing-shadow-offset-value');
 
 const lineSizeSlider = document.getElementById('line-size-slider');
 const lineSize = document.getElementById('line-size');
@@ -373,9 +372,15 @@ pencilSizeSlider.oninput = function() {
   activeTool.size = this.value;
 }
 
-lineSize.innerHTML = lineSizeSlider.value;
-lineSizeSlider.oninput = function() {
-  lineSize.innerHTML = this.value;
+shadowSize.innerHTML = shadowSizeSlider.value;
+shadowSizeSlider.oninput = function() {
+  shadowSize.innerHTML = this.value;
+  activeTool.size = this.value;
+}
+
+shadowOffsetSize.innerHTML = shadowOffsetSizeSlider.value;
+shadowOffsetSizeSlider.oninput = function() {
+  shadowOffsetSize.innerHTML = this.value;
   activeTool.size = this.value;
 }
 

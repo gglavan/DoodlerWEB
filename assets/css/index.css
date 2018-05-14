@@ -33,7 +33,7 @@ body {
   align-items: center;
 }
 
-canvas {
+.wrapper {
   cursor: pointer;
   margin-right: 150px;
   max-width: 100%;
@@ -62,8 +62,8 @@ canvas {
   height: 100%;
   position: absolute;
   top: 0;
-  right: -205px;
-  width: 200px;
+  right: -255px;
+  width: 250px;
   z-index: 0;
   padding-top: 20px;
   background-color: #252A30;
@@ -75,6 +75,20 @@ canvas {
   -ms-transition: right 200ms ease-out;
   -o-transition: right 200ms ease-out;
   -webkit-transition: right 200ms ease-out;
+}
+
+.filters {
+  box-sizing: border-box;
+  padding: 10px;
+  display: block !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  font-family: roboto-light;
+  font-size: 14px;
+}
+
+input[type="color"], select {
+	margin: 10px 5px 10px 5px;
 }
 
 .sidebar-title {
@@ -198,6 +212,7 @@ canvas {
   opacity: 0.7;
   -webkit-transition: .2s;
   transition: opacity .2s;
+  margin-bottom: 15px;
 }
 
 .slider:hover {
@@ -275,4 +290,8 @@ input:checked + .toggle:before {
 
 .toggle.round:before {
   border-radius: 50%;
+}
+
+#histogram {
+  background-color: #fff;
 }
